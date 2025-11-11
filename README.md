@@ -22,6 +22,9 @@ Responsive without layout shift; careful scroll handling
 Zero framework: Plain HTML/CSS/JS, lightweight, fast
 
 🗂 Project Structure
+
+```text
+
 .
 ├── assets/
 │   ├── arena.jpg
