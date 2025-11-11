@@ -1,0 +1,65 @@
+/* ===================================================== */
+/* core/css/utils.css — COMPONENTES REUTILIZABLES GLOBALES */
+/* ===================================================== */
+
+/* ===================================================== */
+/* .bg--carbon — FONDO CARBONO REUTILIZABLE EN TODAS LAS SLIDES */
+/* ===================================================== */
+.bg--carbon {
+  position: absolute;
+  inset: 0;                    /* Cubre todo el contenedor de la slide */
+  z-index: 0;
+  pointer-events: none;        /* No interfiere con clics */
+  background:
+    /* Capa 1: Gradiente cónico para profundidad */
+    conic-gradient(from 320deg at 70% 45%,
+      rgba(42, 42, 42, .1) 0deg 120deg, 
+      transparent 120deg 360deg
+    ),
+    /* Capa 2: Gradiente vertical para iluminación */
+    linear-gradient(180deg,
+      rgba(255, 255, 255, .04) 0%,
+      transparent 30%,
+      rgba(0, 0, 0, .45) 80%,
+      rgba(0, 0, 0, .92) 100%
+    ),
+    /* Capa 3: Color base */
+    var(--bg, #0b0b0b);
+}
+
+/* Textura de fibra de carbono (overlay) */
+.bg--carbon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      60deg,
+      color-mix(in srgb, #ffffff 20%, transparent) 0 3px,
+      color-mix(in srgb, #000000 20%, transparent) 3px 6px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      color-mix(in srgb, #ffffff 20%, transparent) 0 3px,
+      color-mix(in srgb, #000000 20%, transparent) 3px 6px
+    );
+  mix-blend-mode: overlay;
+  opacity: .22;
+  background-size: 6px 6px;
+}
+
+/* Efecto de luz suave (soft-light) */
+.bg--carbon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, .05), transparent 60%),
+    radial-gradient(1px 1px at 65% 60%, rgba(255, 255, 255, .04), transparent 60%),
+    radial-gradient(1px 1px at 80% 15%, rgba(255, 255, 255, .03), transparent 60%),
+    radial-gradient(1px 1px at 35% 80%, rgba(255, 255, 255, .035), transparent 60%);
+  opacity: .08;
+  mix-blend-mode: soft-light;
+}

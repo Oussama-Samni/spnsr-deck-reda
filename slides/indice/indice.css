@@ -1,0 +1,167 @@
+/* Índice — coherente con tema, responsivo y sin cortes (prefijo .idx) */
+.idx{
+  position:relative; width:100%; height:100%;
+  color: var(--color-fg, #fff);
+  font-family: var(--font, "Montserrat", ui-sans-serif, system-ui);
+}
+.idx__bg{ position:absolute; inset:0; z-index:0; }
+
+/* === Tokens globales para scroll (añadir en theme.css si no existen) === */
+:root {
+  --scrollbar-w: 6px;
+  --scrollbar-thumb: rgba(var(--color-fg-rgb, 255, 255, 255), 0.35);
+  --scrollbar-track: transparent;
+}
+
+/* === Scroll container: reserva espacio permanente, thumb invisible hasta hover === */
+.idx__content{
+  position:relative; z-index:1;
+  display:flex; flex-direction:column;
+  padding: clamp(16px, 4.5vw, 56px) clamp(18px, 5.5vw, 64px);
+  height:100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding-bottom: max(10vh, 72px);
+
+  /* Reserva espacio fijo para barra */
+  padding-right: calc(clamp(18px, 5.5vw, 64px) + var(--scrollbar-w));
+  scrollbar-width: thin;
+  scrollbar-color: transparent var(--scrollbar-track);
+  -ms-overflow-style: auto;
+}
+
+/* Webkit: siempre reserva ancho, thumb transparente */
+.idx__content::-webkit-scrollbar {
+  display: block !important;
+  width: var(--scrollbar-w);
+  background: var(--scrollbar-track);
+}
+.idx__content::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+.idx__content::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+
+/* Hover: mostrar thumb opaco (sin shift) */
+.idx__content:hover {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.idx__content:hover::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+}
+
+/* Título con mínimos más seguros */
+.idx__title{
+  margin:0 0 clamp(12px, 2.2vw, 24px);
+  font-weight:900; letter-spacing:.01em;
+  font-size: clamp(1.6rem, 4.2vw, 3.2rem);
+}
+
+/* Lista en columna con gap que escala */
+.idx__list{
+  list-style:none; margin:0; padding:0;
+  display:grid; grid-auto-flow: row; grid-auto-rows: min-content;
+  gap: clamp(10px, 1.6vw, 18px);
+  width: min(64ch, 100%);
+  min-width: 0;
+}
+
+/* Cada elemento */
+.idx__link{
+  --pad: clamp(10px, 1.2vw, 16px);
+  display:flex; align-items:center; gap: clamp(8px, 1.2vw, 14px);
+  padding: var(--pad) calc(var(--pad) * 1.2);
+  background: transparent; border:1px solid transparent;
+  color: inherit; border-radius: var(--radius-md, 12px);
+  width: 100%; text-align: left; cursor: pointer;
+  transition: filter .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+  min-height: clamp(40px, 5.2vw, 64px);
+}
+
+.idx__dot{
+  width: clamp(8px, 1.3vw, 12px);
+  height: clamp(8px, 1.3vw, 12px);
+  border-radius: 50%;
+  background: var(--color-accent, #d40000);
+  flex: 0 0 auto;
+}
+
+.idx__text{
+  font-weight: 800;
+  font-size: clamp(1.02rem, 2.25vw, 1.35rem);
+  letter-spacing: .01em;
+  line-height: 1.2;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Hover/focus accesible */
+.idx__link:hover,
+.idx__link:focus-visible{
+  background: color-mix(in srgb, var(--color-accent, #d40000) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent, #d40000) 36%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--color-accent, #d40000) 28%, transparent);
+  outline: none;
+}
+
+/* Entrada suave */
+.anim-enter{
+  opacity:0; transform: translateY(10%); filter: blur(4px);
+  transition: transform .8s cubic-bezier(.22,.61,.36,1), opacity .8s ease, filter .8s ease;
+}
+.anim-enter.is-in{ opacity:1; transform: translateY(0); filter: blur(0); }
+
+/* ===== RESPONSIVE SAFEGUARDS ===== */
+
+/* Laptops / tablets */
+@media (max-width: 1100px){
+  .idx__content{
+    padding: clamp(14px, 4vw, 42px) clamp(16px, 5vw, 48px);
+    padding-right: calc(clamp(16px, 5vw, 48px) + var(--scrollbar-w));
+    padding-bottom: max(12vh, 72px);
+  }
+  .idx__list{ width: min(66ch, 100%); }
+}
+
+/* Móvil/tablet estrecho */
+@media (max-width: 760px){
+  .idx__content{
+    padding: clamp(12px, 5vw, 32px) clamp(14px, 6vw, 32px);
+    padding-right: calc(clamp(14px, 6vw, 32px) + var(--scrollbar-w));
+    padding-bottom: max(14vh, 84px);
+  }
+  .idx__title{
+    font-size: clamp(1.45rem, 5.2vw, 2.2rem);
+    margin-bottom: clamp(10px, 2vw, 18px);
+  }
+  .idx__list{
+    gap: clamp(8px, 2.2vw, 14px);
+    width: 100%;
+  }
+  .idx__text{
+    font-size: clamp(1rem, 3.8vw, 1.2rem);
+  }
+}
+
+/* Móvil pequeño */
+@media (max-width: 420px){
+  .idx__content{
+    padding-bottom: max(16vh, 96px);
+  }
+  .idx__text{
+    line-height: 1.22;
+  }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .anim-enter,
+  .anim-enter.is-in {
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}

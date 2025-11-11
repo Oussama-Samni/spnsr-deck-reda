@@ -1,0 +1,372 @@
+/* ==========================================================================
+   SLIDE — CIERRE (SOLUCIÓN SIN EMPUJE)
+   ========================================================================== */
+
+.cierre {
+  position: relative;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 100%;
+  overflow: hidden;
+
+  /* Tokens locales (con fallbacks). Evitamos vw/vi: usamos % relativos al contenedor */
+  --cierre-gap: clamp(18px, 2.6vh, 28px);
+  --cierre-pad-x: clamp(16px, 3.2%, 32px);
+  --cierre-pad-top: clamp(24px, 7vh, 96px);
+  --cierre-pad-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  --cierre-title-maxch: 22ch;
+  --cierre-title-size: clamp(2.2rem, 6vw, 4.2rem);
+  --cierre-btn-min-w: 220px;
+  --cierre-btn-gap: clamp(14px, 2.2%, 20px); /* % en vez de vw */
+  --cierre-btn-min-h: clamp(56px, 7.5vh, 72px);
+  --cierre-btn-pad-y: clamp(14px, 2.4vh, 18px);
+  --cierre-btn-pad-x: clamp(20px, 3.4%, 32px); /* % en vez de vw */
+  --cierre-radius: var(--radius-lg, 18px);
+  --cierre-fg: var(--color-foreground, #fff);
+  --cierre-fg-muted: color-mix(in oklab, var(--cierre-fg) 66%, transparent);
+  --cierre-shadow: 0 10px 28px rgba(0,0,0,.34);
+  --cierre-ease: var(--ease-curve, cubic-bezier(.2,.6,.2,1));
+}
+
+.cierre > .cierre__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Contenido scrollable sin gutter estable y sin depender de vw */
+.cierre > .cierre__content {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--cierre-gap);
+
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 100%;
+
+  padding-inline: var(--cierre-pad-x);
+  padding-block: var(--cierre-pad-top) var(--cierre-pad-bottom);
+
+  overflow-y: auto;                 /* scroll interno */
+  /* Nada de gutter estable -> no reserva espacio */
+  scrollbar-gutter: initial;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Header */
+.cierre > .cierre__content > .cierre__header {
+  inline-size: 100%;
+  display: grid;
+  justify-items: center;
+}
+
+.cierre > .cierre__content > .cierre__header .cierre__title {
+  margin: 0;
+  max-inline-size: var(--cierre-title-maxch);
+  text-align: center;
+  font-weight: 900;
+  letter-spacing: .02em;
+  font-size: var(--cierre-title-size);
+  line-height: 1.1;
+  color: var(--cierre-fg);
+  text-shadow: 0 0 26px color-mix(in oklab, var(--cierre-fg) 45%, transparent);
+}
+
+/* Main empuja el legal al final */
+.cierre > .cierre__content > .cierre__main {
+  inline-size: 100%;
+  min-block-size: 0;
+  flex: 1 0 auto;
+
+  display: grid;
+  place-items: center;
+  padding-block-end: 16px;
+}
+
+/* Botonera: sin vw, todo % / max a 100% del contenedor */
+.cierre > .cierre__content .cierre__btns {
+  --btn-min-w: var(--cierre-btn-min-w);
+  --btn-gap: var(--cierre-btn-gap);
+
+  inline-size: 100%;
+  max-inline-size: min(1200px, 100%); /* <== antes 96vw */
+  margin-inline: auto;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(var(--btn-min-w), 1fr));
+  gap: var(--btn-gap);
+
+  justify-content: center;
+  justify-items: stretch;
+  align-items: stretch;
+  align-content: center;
+}
+
+@media (max-width: 1023.98px) {
+  .cierre > .cierre__content .cierre__btns {
+    grid-template-columns: repeat(2, minmax(var(--btn-min-w), 1fr));
+    max-inline-size: min(900px, 100%); /* <== antes 96vw */
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cierre > .cierre__content .cierre__btns {
+    --btn-min-w: 0px;
+    grid-template-columns: 1fr;
+    max-inline-size: 100%; /* <== antes 92vw */
+  }
+  .cierre > .cierre__content .cierre__btns .cierre__btn--wide {
+    grid-column: auto;
+  }
+}
+
+.cierre > .cierre__content .cierre__btns > * {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+/* Botón cristal */
+.cierre > .cierre__content .cierre__btn {
+  min-block-size: var(--cierre-btn-min-h);
+  padding: var(--cierre-btn-pad-y) var(--cierre-btn-pad-x);
+  border-radius: var(--cierre-radius);
+
+  background:
+    linear-gradient(180deg, color-mix(in oklab, #fff 20%, transparent) 0%, color-mix(in oklab, #fff 8%, transparent) 100%),
+    color-mix(in oklab, #fff 6%, transparent);
+  border: 1px solid color-mix(in oklab, #fff 30%, transparent);
+  box-shadow:
+    var(--cierre-shadow),
+    inset 0 1px 0 color-mix(in oklab, #fff 35%, transparent),
+    inset 0 -1px 0 color-mix(in oklab, #000 12%, transparent);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--cierre-fg);
+  text-decoration: none;
+  text-align: center;
+  font-weight: 800;
+  font-size: clamp(1.05rem, 2.1vw, 1.35rem);
+  line-height: 1.2;
+  letter-spacing: .01em;
+
+  white-space: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+
+  transition: transform .12s var(--cierre-ease),
+              box-shadow .2s var(--cierre-ease),
+              background .2s var(--cierre-ease),
+              border-color .2s var(--cierre-ease);
+}
+
+.cierre > .cierre__content .cierre__btn:where(:hover, :focus-visible) {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 599.98px) {
+  .cierre > .cierre__content .cierre__btn {
+    font-size: clamp(1.08rem, 4.6vw, 1.28rem);
+    padding: clamp(14px, 2.6vh, 18px) clamp(18px, 5%, 24px); /* % en vez de vw */
+  }
+}
+
+/* Legal al final (en flujo) */
+.cierre > .cierre__content .cierre__legal {
+  position: static;
+  z-index: 1;
+  flex: 0 0 auto;
+
+  inline-size: 100%;
+  block-size: auto;
+  padding-block: 8px;
+  margin-block-start: clamp(16px, 3vh, 24px);
+
+  font-size: clamp(.85rem, 1.6vw, .95rem);
+  color: var(--cierre-fg);
+  opacity: .66;
+  text-align: center;
+}
+
+/* Flechas opcionales */
+.cierre > .nav-arrows {
+  position: absolute;
+  inset-inline: 12px;
+  inset-block-end: calc(48px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+.cierre > .nav-arrows .nav-arrow {
+  pointer-events: auto;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  inline-size: auto;
+  block-size: auto;
+  line-height: 0;
+  cursor: pointer;
+}
+.cierre > .nav-arrows .nav-arrow svg {
+  inline-size: 26px;
+  block-size: 26px;
+}
+.cierre > .is-hidden { display: none !important; }
+
+/* Scrollbar constante (sin cambios de ancho en :hover) */
+.cierre > .cierre__content { scrollbar-width: thin; }                 /* Firefox */
+.cierre > .cierre__content { scrollbar-color: color-mix(in oklab, var(--cierre-fg) 35%, transparent) transparent; }
+
+.cierre > .cierre__content::-webkit-scrollbar {                        /* WebKit/Blink */
+  inline-size: 8px;
+  block-size: 8px;
+}
+.cierre > .cierre__content::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--cierre-fg) 35%, transparent);
+  border-radius: 8px;
+}
+.cierre > .cierre__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+/* === POPUP GALERÍA (modal full-screen por encima del slide) === */
+.galeria-popup{
+  position: fixed;           /* evita que .cierre{overflow:hidden} la recorte */
+  inset: 0;
+  z-index: 2000;             /* por encima de .nav-arrows (1000) y content (1) */
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 24px);
+
+  background: rgba(0,0,0,.65);     /* backdrop */
+  backdrop-filter: blur(2px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition: opacity 220ms var(--cierre-ease), visibility 220ms linear;
+}
+
+.galeria-popup.open{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Contenedor de imágenes */
+.galeria-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(8px, 1.6vw, 16px);
+  max-width: min(1200px, 94vw);
+  max-height: 86vh;
+  overflow: auto;
+  padding: clamp(8px, 1.2vw, 12px);
+  background: rgba(18,18,18,.85);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--cierre-radius);
+  box-shadow: 0 18px 60px rgba(0,0,0,.5);
+}
+
+.galeria-grid img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: calc(var(--cierre-radius) * .6);
+  opacity: .0;
+  transform: scale(.985);
+  transition: opacity 240ms ease, transform 240ms var(--cierre-ease);
+}
+.galeria-grid img.loaded{
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Botón cerrar (esquina superior derecha) */
+.galeria-close{
+  position: absolute;
+  top: clamp(8px, 2vw, 16px);
+  right: clamp(8px, 2vw, 16px);
+  z-index: 1;
+  border: 0;
+  border-radius: 999px;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  font-size: 24px; line-height: 1;
+  color: #fff;
+  background: rgba(0,0,0,.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 20px rgba(0,0,0,.35);
+  cursor: pointer;
+}
+
+/* Responsive grilla */
+@media (max-width: 1024px){ .galeria-grid{ grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 700px) { .galeria-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 420px) { .galeria-grid{ grid-template-columns: 1fr; } }
+
+
+/* ====== VISOR FULLSCREEN DENTRO DEL POPUP (añadido) ====== */
+.galeria-viewer{
+  position: absolute;
+  inset: 0;
+  display: none;                     /* se muestra con .is-open */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(1px);
+  z-index: 2;                         /* por encima de .galeria-grid */
+}
+
+.galeria-viewer.is-open{ display: flex; }
+
+.galeria-viewer__img{
+  max-width: 92vw;
+  max-height: 86vh;
+  object-fit: contain;
+  border-radius: calc(var(--cierre-radius) * .66);
+  box-shadow: 0 18px 60px rgba(0,0,0,.55);
+  user-select: none;
+  pointer-events: auto;
+}
+
+/* Botones de navegación del visor */
+.gv-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  width: 48px; height: 48px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  font-size: 28px; line-height: 1;
+  color: #fff;
+  background: rgba(0,0,0,.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 20px rgba(0,0,0,.35);
+  cursor: pointer;
+  z-index: 3;
+  transition: transform 160ms var(--cierre-ease), background 160ms var(--cierre-ease);
+}
+
+.gv-btn:hover{ transform: translateY(-50%) scale(1.04); }
+.gv-prev{ left: clamp(8px, 2vw, 16px); }
+.gv-next{ right: clamp(8px, 2vw, 16px); }
+
+/* Cuando el visor está abierto, ocultamos visualmente la grid detrás */
+.galeria-popup.viewer-open .galeria-grid{
+  visibility: hidden;
+}

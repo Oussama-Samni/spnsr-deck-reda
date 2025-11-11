@@ -1,0 +1,373 @@
+/* === Identidad — CSS limpio (desktop / tablet con scroll de slide / móvil 1 columna) === */
+
+/* Box-sizing consistente dentro de la slide */
+.identidad, .identidad *, .identidad *::before, .identidad *::after{
+  box-sizing: border-box;
+}
+
+/* Fondo */
+.identidad__bg{ 
+  position: absolute; 
+  inset: 0; 
+  z-index: 0; 
+}
+
+/* ========== BASE: Desktop (≥1024px) — sin scroll ========== */
+.identidad{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center; 
+  justify-content: space-between;
+  color: var(--color-fg, #fff);
+  font-family: var(--font, "Montserrat", ui-sans-serif, system-ui);
+  padding: 4vw 6vw;
+  overflow: hidden;              
+  --type-scale: 1;
+  --copy-maxw: 48ch;
+
+  /* Imagen (desktop) */
+  --img-width: 130%;
+  --img-offset-x: -20%;
+  --img-offset-y  : 6%;
+  --img-enter-y   : 30%;
+  --img-blur      : 6px;
+  --img-ease      : cubic-bezier(.22,.61,.36,1);
+  --img-speed     : 1100ms;
+
+  /* Valores (base) */
+  --values-pad: 0.9rem;
+  --values-gap: 1.2rem;
+}
+
+/* Imagen izquierda */
+.identidad__media{
+  flex: 1 1 45%;
+  display: flex; 
+  align-items: center; 
+  justify-content: flex-start;
+  z-index: 1;
+}
+.identidad .identidad__media img{
+  width: var(--img-width);
+  height: auto;
+  max-height: 85vh;
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(var(--img-blur));
+  transform:
+    translateX(var(--img-offset-x))
+    translateY(calc(var(--img-offset-y) + var(--img-enter-y)));
+  transition:
+    transform var(--img-speed) var(--img-ease),
+    opacity   var(--img-speed) ease-out,
+    filter    var(--img-speed) var(--img-ease);
+  will-change: transform, opacity, filter;
+}
+.identidad .identidad__media img.is-in{
+  opacity: 1;
+  transform:
+    translateX(var(--img-offset-x))
+    translateY(var(--img-offset-y));
+  filter: blur(0);
+}
+
+/* Copy derecha */
+.identidad__copy{
+  flex: 1 1 50%;
+  z-index: 2;
+  text-align: left;
+  padding-left: 1vw;
+  max-width: var(--copy-maxw);
+  min-width: 0;
+}
+.identidad__title{
+  font-weight: 700;
+  font-size: clamp(calc(2.2rem * var(--type-scale)),
+                   calc(4.6vw   * var(--type-scale)),
+                   calc(3.8rem * var(--type-scale)));
+  margin: 0 0 1rem 0;
+}
+.identidad__text{
+  font-weight: 400;
+  font-size: clamp(calc(1rem  * var(--type-scale)),
+                   calc(1.6vw * var(--type-scale)),
+                   calc(1.2rem * var(--type-scale)));
+  line-height: 1.5;
+  text-align: justify;
+  text-justify: inter-word;
+  max-width: var(--copy-maxw);
+  margin: 0;
+}
+
+/* ========== VALORES EN DESKTOP: 2 arriba, 1 debajo (ancho completo) ========== */
+.identidad__values{
+  display: grid;
+  grid-template-columns: 1fr 1fr;        /* 2 columnas */
+  grid-template-areas: 
+    "a b"
+    "c c";                               /* ← 3ª caja ocupa ambas columnas */
+  gap: var(--values-gap);
+  margin-top: 2rem;
+  max-width: var(--copy-maxw);
+}
+
+/* Asignar áreas a cada caja */
+.identidad__values .value-card:nth-child(1) { grid-area: a; }
+.identidad__values .value-card:nth-child(2) { grid-area: b; }
+.identidad__values .value-card:nth-child(3) { grid-area: c; }
+
+/* Estilos de caja (sin cambios en hover) */
+.value-card{
+  border: 2px solid var(--color-accent, #d40000);
+  border-radius: var(--radius-md, 12px);
+  padding: var(--values-pad);
+  color: var(--color-fg, #fff);
+  background: color-mix(in srgb, var(--color-accent, #d40000) 12%, transparent);
+  backdrop-filter: blur(2px);
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  text-align: center; 
+  font-weight: 600; 
+  letter-spacing: .02em;
+  min-height: 56px;
+}
+
+/* HOVER: pulso rojo (sin tocar) */
+.value-card:hover{
+  background: color-mix(in srgb, var(--color-accent, #d40000) 18%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent, #d40000) 40%, transparent);
+}
+
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .identidad__media img, .identidad__title, .identidad__text, .value-card{
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* === Añadir tokens globales si no existen en theme.css (opcional, para OCP) === */
+:root {
+  --scrollbar-w: 6px;       /* Ancho consistente */
+  --scrollbar-thumb: rgba(var(--color-fg-rgb, 255, 255, 255), 0.35); /* Usar token color-fg */
+  --scrollbar-track: transparent;
+}
+
+/* === Fix general para .identidad__copy (aplica a todos breakpoints con scroll) === */
+.identidad__copy {
+  /* Siempre reserva espacio */
+  scrollbar-width: thin;                /* Firefox: thin siempre, reserva espacio */
+  scrollbar-color: transparent var(--scrollbar-track); /* Thumb invisible por defecto */
+  -ms-overflow-style: auto;             /* IE/Edge: auto, pero con colores */
+  padding-right: var(--scrollbar-w);    /* Reserva mínima, ajusta si necesitas más */
+  overflow-y: auto;                     /* Mantiene scroll */
+  overflow-x: hidden;
+}
+
+/* Webkit siempre visible (reserva espacio), thumb invisible */
+.identidad__copy::-webkit-scrollbar {
+  display: block !important;            /* Siempre block, no none */
+  width: var(--scrollbar-w);
+  background: var(--scrollbar-track);
+}
+.identidad__copy::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+.identidad__copy::-webkit-scrollbar-thumb {
+  background: transparent;              /* Invisible por defecto */
+  border-radius: 3px;
+}
+
+/* Al hover: mostrar thumb opaco (sin shift, ya que espacio reservado) */
+.identidad__copy:hover {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); /* Firefox */
+}
+.identidad__copy:hover::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);   /* Webkit */
+}
+
+/* ========== TABLET (724–1023.98px) ========== */
+@media (max-width: 1023.98px) and (min-width: 724px){
+  .identidad{
+    padding: 4.6vw 5vw;
+    --type-scale: .93;
+    align-items: stretch;
+    overflow: hidden;                    /* ← Sin scroll en slide */
+  }
+
+  .identidad__media{ 
+    flex-basis: 50%; 
+  }
+  .identidad .identidad__media img{
+    width: 118%;
+    max-height: 80vh;
+  }
+
+  /* === COPY CON SCROLL + ESPACIO RESERVADO === */
+  .identidad__copy{
+    flex-basis: 50%;
+    max-width: 46ch;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: clamp(12px, 1.8vw, 18px);
+    min-height: 0;
+
+    /* Scroll solo aquí */
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* RESERVA ESPACIO FIJO PARA BARRA */
+    padding-right: var(--scrollbar-w);  /* Reduce de 12px a 6px, ya que reserva nativa */
+    scrollbar-gutter: stable;           /* Mantiene si supported, para extra seguridad */
+  }
+
+  .identidad__text{
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .identidad__values{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: clamp(8px, 1.4vw, 14px);
+    margin-top: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+  .value-card{
+    flex: 1 1 0;
+    min-width: 0;
+    --vs: .74;
+    padding: calc(var(--values-pad) * var(--vs));
+    border-width: calc(2px * var(--vs));
+    font-size: calc(1rem * var(--vs));
+    min-height: calc(50px * var(--vs));
+  }
+
+  /* Evita compresión en hijos: no need max-width adjust, ya que no shift */
+  .identidad__title,
+  .identidad__text,
+  .identidad__values {
+    max-width: 100%;                    /* Full, sin restar */
+  }
+}
+
+
+/* ========== MÓVIL (≤723.98px) — SIN LAYOUT SHIFT ========== */
+@media (max-width: 723.98px){
+  .identidad{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+    --type-scale: .90;
+  }
+
+  /* === IMAGEN FIJA === */
+  .identidad__media{
+    position: absolute; 
+    inset: 0;
+    width: 100%; 
+    height: 100%;
+    z-index: 0; 
+    pointer-events: none;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+  }
+  
+  .identidad .identidad__media img{
+    width: 100%; 
+    height: 100%;
+    object-fit: cover; 
+    object-position: left center;
+    transform: none !important;
+    opacity: .32;
+    filter: blur(4px);
+  }
+
+  .identidad__media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.42);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* === COPY CON SCROLL + ESPACIO RESERVADO (SIN SALTO) === */
+  .identidad__copy{
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 100vw;
+    padding: 8vw;
+    padding-right: calc(8vw + var(--scrollbar-w)); /* Reserva mínima */
+
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: clamp(12px, 4vw, 18px);
+
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Evita compresión en hijos */
+  .identidad__title,
+  .identidad__text,
+  .identidad__values {
+    max-width: 100%;                    /* Quita el -17px, no need */
+  }
+
+  /* En móvil, fuerza overlay si posible (iOS lo hace auto), pero fallback reserva */
+  .identidad__copy::-webkit-scrollbar {
+    width: 0px;                         /* Overlay en touch si supported, sino thin */
+  }
+  .identidad__copy:hover::-webkit-scrollbar {
+    width: var(--scrollbar-w);          /* Muestra al "hover" simulado */
+  }
+
+  .identidad__title{
+    font-size: clamp(1.5rem, 6.4vw, 2.1rem);
+    margin-bottom: .2rem;
+    overflow-wrap: anywhere;
+  }
+  .identidad__text{
+    font-size: clamp(.92rem, 4.0vw, 1.06rem);
+    line-height: 1.46;
+  }
+
+  .identidad__values{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .9rem;
+    margin-top: .2rem;
+    width: 100%;
+  }
+  .value-card{
+    --vs: .92;
+    width: 100%;
+    padding: calc(var(--values-pad) * var(--vs));
+    border-width: calc(2px * var(--vs));
+    font-size: calc(1rem * var(--vs));
+    min-height: calc(48px * var(--vs));
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* Reduce motion: no afecta scroll */
+@media (prefers-reduced-motion: reduce) {
+  /* Sin cambios extra */
+}

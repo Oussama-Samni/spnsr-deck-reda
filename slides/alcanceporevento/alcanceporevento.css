@@ -1,0 +1,228 @@
+/* ==========================================================================
+   SLIDE — ALCANCE POR EVENTO (patrón valor-marcas, 100% tokens)
+   ========================================================================== */
+
+.alcanceporevento{
+  position: relative;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  color: var(--color-fg, var(--fg,#fff));
+  font-family: var(--font, "Montserrat", ui-sans-serif, system-ui);
+
+  /* tokens locales */
+  --u: 10px;
+  --cap: 720px;
+
+  --c-accent:  var(--color-accent, var(--accent,#d81e1e));
+  --c-fg:      var(--color-fg, var(--fg,#ffffff));
+
+  --bar-height:  calc(3.8 * var(--u));
+  --bar-radius:  0px;
+  --bar-padding: calc(1.6 * var(--u));
+
+  --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-slow: 1400ms;
+  --duration-num:  1600ms;
+
+  --gap: var(--spacing-xl, 28px);
+  --section-gap: calc(2.0 * var(--gap));
+
+  --tag-sub-offset: calc(1 * var(--u));
+  
+
+  padding: var(--spacing-2xl, 36px) var(--spacing-3xl, 44px);
+
+  /* no reservar gutter ⇒ evita empuje */
+  scrollbar-gutter: initial;
+
+}
+ 
+/* Fondo */
+.alcanceporevento .bg--carbon{ position:absolute; inset:0; z-index:0; }
+
+/* Contenido */
+.alcanceporevento__content{
+  position: relative; z-index: 1; inset: 0; height: 100%;
+  display: grid; grid-template-rows: auto 1fr;
+  gap: var(--gap);
+}
+
+/* Header */
+.alcanceporevento__title{
+  margin:0; font-weight:900; letter-spacing:.01em;
+  font-size: clamp(1.8rem, 5.0vw, 3.6rem);
+}
+.alcanceporevento__header{ margin-block-end: calc(2.4 * var(--u)); }
+
+/* Body */
+.alcanceporevento__body{
+  display:flex; flex-direction:column; gap: var(--section-gap);
+  justify-content: center;
+}
+.metrics{
+  display:grid; grid-template-columns: 1fr;
+  gap: calc(4.8 * var(--u));
+  max-inline-size: clamp(64ch, 78%, 96ch);
+}
+
+/* Métrica */
+.metric{ display:flex; flex-direction:column; gap: calc(0.7 * var(--u)); }
+.metric__label{
+  font-weight:900; letter-spacing:.02em; opacity:.96;
+  font-size: clamp(1.05rem, 2.2vw, 1.45rem);
+  line-height: 1.25;
+  padding: calc(.2 * var(--u)) 0;
+}
+
+/* Barras (patrón valor-marcas) */
+.alcanceporevento .vbar{
+  position:relative;
+  width: min(100%, var(--cap));
+  height: var(--bar-height);
+  border-radius: var(--bar-radius);
+  overflow:hidden;
+  background: color-mix(in srgb, var(--c-fg) 10%, transparent);
+}
+.alcanceporevento .vbar__fill{
+  position:absolute; inset:0 auto 0 0;
+  width: calc(var(--p,0) * 100%);
+  height:100%;
+  background: var(--c-accent);
+  display:flex; align-items:center; justify-content:center;
+  padding: 0 var(--bar-padding);
+  transition: width var(--duration-slow) var(--ease-standard);
+}
+.alcanceporevento .vbar__num{
+  font-weight:900; color:var(--c-fg);
+  font-size: calc(1.1 * var(--bar-height));
+  line-height:1; white-space: nowrap;
+  opacity: 0; transform: translateY(4px);
+  transition:
+    opacity var(--duration-num) ease-out,
+    transform var(--duration-num) var(--ease-standard);
+}
+.alcanceporevento .vbar__num.is-in{ opacity:1 !important; transform: translateY(0) !important; }
+
+/* Enter */
+.anim-enter{
+  opacity:0; transform: translateY(12%); filter: blur(4px);
+  transition: transform 800ms var(--ease-standard),
+              opacity   800ms ease,
+              filter    800ms var(--ease-standard);
+}
+.anim-enter.is-in{ opacity:1; transform: translateY(0); filter: blur(0); }
+
+/* Scrollbar sutil (ancho constante) */
+.alcanceporevento{ scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.alcanceporevento:hover{ scrollbar-color: rgba(255,255,255,0.38) transparent; }
+.alcanceporevento::-webkit-scrollbar{ inline-size: 6px; background: transparent; }
+.alcanceporevento::-webkit-scrollbar-thumb{ background: transparent; border-radius: 3px; }
+.alcanceporevento:hover::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.38); }
+
+/* Responsive */
+@media (max-width: 700px){
+  .metrics{ max-inline-size: 100%; }
+  .alcanceporevento .vbar{ width: 100%; --cap: 100% !important; }
+}
+
+
+/* Imagen derecha superpuesta: por encima del bg, por debajo del contenido */
+.alcanceporevento__media{
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 50%;               /* ocupa mitad derecha */
+  z-index: 0;               /* bg (0) < media (0, aparece después) < content (1) */
+  pointer-events: none;     /* no bloquea interacciones */
+  overflow: hidden;
+}
+
+/* Capa negra para atenuar sin tocar el resto */
+.alcanceporevento__media::after{
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.45);  /* filtro negro suave */
+}
+
+/* La imagen rellena su mitad */
+.alcanceporevento__media img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  opacity: 0; transform: translateY(8%);
+  transition: transform 800ms var(--ease-standard), opacity 800ms ease;
+}
+.alcanceporevento__media img.is-in{
+  opacity: 1; transform: translateY(0);
+}
+
+
+/* === Cabecera de métrica: label izq + tag der (solo donde la uses) === */
+.alcanceporevento .metric__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(1.0 * var(--u));
+  flex-wrap: wrap; /* si no cabe, la etiqueta baja a la línea siguiente */
+}
+.alcanceporevento .metric__head .metric__label{ margin: 0; }
+
+/* === Etiqueta rectangular con halo rojo (texto SIEMPRE blanco, alineado a la IZQUIERDA) === */
+.alcanceporevento .metric__tag{
+  --tag-radius: var(--radius-md, 14px);
+  --tag-pad-x: calc(0.9 * var(--u));
+  --tag-pad-y: calc(0.5 * var(--u));
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;      /* ⬅️ pegado a la izquierda */
+  text-align: left;
+  gap: calc(0.25 * var(--u));
+  padding: var(--tag-pad-y) var(--tag-pad-x);
+  border-radius: var(--tag-radius);
+  background: color-mix(in srgb, var(--c-accent) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-accent) 48%, transparent);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.18),
+    0 0 18px color-mix(in srgb, var(--c-accent) 55%, transparent); /* halo rojo */
+  color: var(--c-fg);
+  white-space: nowrap;
+}
+
+/* Línea 1: "Arena" */
+.alcanceporevento .metric__tag-title-main{
+  font-weight: 800;
+  letter-spacing: .01em;
+  line-height: 1.05;
+  font-size: clamp(0.92rem, 1.7vw, 1.06rem);
+}
+
+/* Línea 2: "Santiago Martin" */
+.alcanceporevento .metric__tag-sub{
+  font-weight: 500;
+  line-height: 1.05;
+  opacity: .95;
+  font-size: clamp(0.62rem, 1.3vw, 0.86rem);
+  margin-block-start: var(--tag-sub-offset);
+}
+
+/* Línea 3: "5100" */
+.alcanceporevento .metric__tag-value{
+  font-weight: 900;
+  line-height: 1;
+  font-size: clamp(0.98rem, 1.9vw, 1.18rem);
+}
+
+/* (Opcional) caja cuadrada manteniendo alineación a la izquierda */
+.alcanceporevento .metric__tag--square{
+  width: clamp(120px, 16vw, 160px);
+  aspect-ratio: 1 / 1;
+  justify-content: center; /* centra vertical; texto sigue a la izquierda */
+}
+
+@media (max-width: 520px){
+  .alcanceporevento .metric__tag{ margin-top: calc(0.4 * var(--u)); }
+}

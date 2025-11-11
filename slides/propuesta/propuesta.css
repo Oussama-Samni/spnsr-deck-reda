@@ -1,0 +1,157 @@
+/* === Propuesta (tokens locales) === */
+.propuesta{
+  --u: 10px;
+  --nav-offset: 12px;
+  --nav-icon: 26px;
+  --scrollbar-w: 6px;
+  --scrollbar-thumb: rgba(255,255,255,0.38);
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: var(--color-fg);
+  font-family: var(--font);
+  padding: calc(4 * var(--u)) calc(3 * var(--u));
+  contain: layout paint;
+  /* IMPORTANTE: como en valorMarcas, el scroll NO va aquí */
+  overflow: hidden;
+}
+
+.propuesta__bg{ position: absolute; inset: 0; z-index: 0; background: var(--bg, #0b0b0b); }
+
+/* Layout general:  header / spacer / paquetes */
+.propuesta__content{
+  position: relative; z-index: 1; inset: 0; height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: calc(3 * var(--u));
+  justify-items: center;
+  align-items: start;
+  place-content: start center;
+  padding: var(--u) 0;
+
+  /* ⬇️ Como en .valorm__content */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: var(--scrollbar-w);
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Scrollbar solo al hover (mismo patrón que en valorMarcas) */
+.propuesta__content:hover {
+  scrollbar-color: var(--scrollbar-thumb, rgba(255,255,255,0.38)) transparent;
+}
+.propuesta__content{
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.propuesta__content::-webkit-scrollbar { width: var(--scrollbar-w); background: transparent; }
+.propuesta__content::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+.propuesta__content:hover::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); }
+
+/* Header */
+.propuesta__header{ text-align: center; }
+.propuesta__title{
+  margin: 0 0 calc(2.5 * var(--u));
+  font-weight: 900; letter-spacing: .01em;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  color: #fff;
+}
+
+/* Spacer controlado por JS */
+.propuesta__spacer{ height: 0; }
+
+/* Grid de paquetes */
+.propuesta__paquetes{
+  display: grid;
+  grid-template-columns: repeat(4, 333px);
+  gap: calc(2 * var(--u));
+  justify-content: center;
+  justify-self: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 calc(1 * var(--u));
+}
+
+/* Breakpoints */
+@media (max-width: 1400px){
+  .propuesta__paquetes{
+    grid-template-columns: repeat(2, 333px);
+    max-width: 800px;
+    gap: calc(2.5 * var(--u));
+  }
+}
+@media (max-width: 800px){
+  .propuesta__spacer{ height: 0 !important; }
+  .propuesta__paquetes{ grid-template-columns: 1fr; max-width: 90%; gap: calc(1.5 * var(--u)); }
+  .paquete{ max-width: 85%; margin: 0 auto; }
+  .propuesta__title{ margin-bottom: clamp(calc(2 * var(--u)), 3vh, calc(4 * var(--u))); }
+  .propuesta__content{ gap: clamp(calc(2 * var(--u)), 3vh, calc(3.5 * var(--u))); }
+}
+
+/* Cards */
+.paquete{
+  background: color-mix(in srgb, var(--color-fg) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-fg) 64%, transparent);
+  border-radius: var(--radius-lg, 18px);
+  padding: calc(2.2 * var(--u));
+  min-height: 380px;
+  display: flex; flex-direction: column;
+  width: 333px; max-width: 90%;
+  margin: 0 auto;
+  transition: transform 200ms ease, background 200ms ease;
+}
+@media (hover:hover){ 
+  .paquete:hover{ 
+    background: color-mix(in srgb, var(--color-fg) 10%, transparent); 
+    transform: translateY(-4px); 
+    border-color: color-mix(in srgb, var(--color-fg) 64%, transparent);
+  } }
+
+.popular{ border: 1px solid #FFD700; box-shadow: 0 0 17px #FFD700; }
+.popular .popular-tag{
+  position: absolute; top: -14px; left: 16px;
+  background:#FFD700; color:#000; font-weight:900; font-size:.75rem;
+  padding:4px 12px; border-radius:20px; letter-spacing:.05em;
+}
+
+.paquete__body{ flex: 1; display: flex; flex-direction: column; }
+.paquete__nivel{ margin: 0 0 calc(.8 * var(--u)); font-weight: 900; font-size: clamp(1.6rem,3.2vw,2.3rem); color:#fff; }
+.paquete__beneficios{ list-style:none; padding:0; margin:0 0 calc(1.8 * var(--u)); flex:1; }
+.paquete__beneficios li{
+  margin: calc(1.2 * var(--u)) 0; position: relative; padding-left: calc(1.6 * var(--u));
+  font-weight: 700; font-size: clamp(1rem,1.9vw,1.2rem); color:#fff; line-height:1.6;
+}
+.paquete__beneficios li::before{ content:"•"; position:absolute; left:0; color:#fff; font-weight:900; }
+.paquete__footer{ margin-top: auto; }
+.paquete__alcance{ margin:0 0 calc(.4 * var(--u)); font-size:clamp(.95rem,1.8vw,1.15rem); color:#fff; opacity:.9; }
+.paquete__precio{ margin:0; font-weight:900; font-size:clamp(1rem,2.5vw,1.5rem); color:#fff; }
+.paquete__mes{ font-size:clamp(.8rem,1.6vw,1rem); opacity:.8; color:#fff; }
+
+/* Móvil: aire extra */
+@media (max-width: 700px){
+  .propuesta__paquetes{ gap: calc(1.5 * var(--u)); }
+  .paquete{ max-width: 85%; min-height: 340px; }
+}
+
+/* Animación */
+.anim-enter{ opacity: 0; transform: translateY(20%); transition: opacity 600ms ease, transform 600ms ease; }
+.anim-enter.is-in{ opacity: 1; transform: translateY(0); }
+
+/* === Flechas como en otras slides (no afectadas por scroll) === */
+.propuesta .nav-arrows{
+  position: absolute;         /* ⬅️ igual que el resto */
+  left: var(--nav-offset);
+  right: var(--nav-offset);
+  bottom: var(--nav-offset);
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 50;
+  pointer-events: none;
+}
+.propuesta .nav-arrow{
+  pointer-events: auto;
+  background: transparent; border: none; border-radius: 0; box-shadow: none;
+  padding: 0; width: auto; height: auto; line-height: 0; cursor: pointer;
+  transform: none; transition: none; filter: none;
+}
+.propuesta .nav-arrow svg{ width: var(--nav-icon); height: var(--nav-icon); }

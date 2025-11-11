@@ -1,0 +1,271 @@
+/* === Slide: La entrada (limpio y SOLID) === */
+.entrada{
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  /* Tipografía / Espaciado (escalables) */
+  --type-scale: 1.40;
+  --first-bump: 1.30;
+  --space-scale: 1.30;
+
+  /* Animación (controles) */
+  --anim-translate-img: 33%;
+  --anim-translate-text: 18%;
+  --anim-blur-img: 4px;
+  --anim-blur-text: 30px;
+  --anim-img-duration: 1200ms;
+  --anim-text-duration: 800ms;
+  --anim-ease: var(--ease-curve);
+
+  /* Controles foto (tamaño + offset vertical permanente) */
+  --entrada-foto-h: 150%;
+  --entrada-foto-offset-y: 25%;
+
+  /* Layout del texto */
+  --copy-grid-left: 52%;
+  --copy-maxw: 42ch;
+  --copy-pad: 6%;
+
+  /* NUEVO TOKEN LOCAL (SOLID) */
+  --tag-color: #ff0048;   /* ← ROJO UFC, EDITABLE AQUÍ */
+}
+
+/* Fondo ahora lo pone .bg--carbon */
+.entrada__bg{ position:absolute; inset:0; z-index:0; }
+
+/* Banda diagonal izquierda */
+.entrada__band{
+  position:absolute; inset:0;
+  clip-path: polygon(0% 50%, 50% 100%, 0% 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(120,120,120,1) 0%,
+    rgba(90,90,90,.65) 45%,
+    rgba(60,60,60,.25) 75%,
+    rgba(0,0,0,0) 100%
+  );
+  box-shadow:
+    inset 0 -40px 80px rgba(0,0,0,.55),
+    inset -30px 0 60px rgba(0,0,0,.4);
+  z-index:2; pointer-events:none;
+}
+
+/* Imagen atleta: izquierda, detrás de banda */
+.entrada__media{
+  position:absolute; z-index:1; left:0; top:0; width:50%; height:100%;
+  display:flex; align-items:flex-end; justify-content:center; padding-left:2%;
+}
+.entrada__media img{
+  height: var(--entrada-foto-h);
+  width: auto;
+  object-fit: contain;
+  filter: blur(var(--anim-blur-img)) drop-shadow(0 28px 60px rgba(0,0,0,.55));
+  opacity: 0;
+  transform: translateY(calc(var(--anim-translate-img) + var(--entrada-foto-offset-y))) scale(.985);
+  transition:
+    transform var(--anim-img-duration) var(--anim-ease),
+    opacity   calc(var(--anim-img-duration) - 200ms) ease-out,
+    filter    var(--anim-img-duration) var(--anim-ease);
+  will-change: transform, opacity, filter;
+}
+.entrada__media img.is-in{
+  opacity: 1;
+  transform: translateY(var(--entrada-foto-offset-y)) scale(1);
+  filter: blur(0px) drop-shadow(0 28px 60px rgba(0,0,0,.55));
+}
+
+/* Texto a la derecha */
+.entrada__copy{
+  position:absolute; inset:0; z-index:3;
+  display:grid;
+  grid-template-columns: var(--copy-grid-left) 1fr;
+  align-items:center;
+  padding: var(--copy-pad);
+  color:#fff;
+  text-align: right;
+  overflow-y: hidden;
+}
+.entrada__name{
+  grid-column:2;
+  justify-self:end;
+  text-align:left;
+  min-width: 0;
+  max-width: var(--copy-maxw);
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+  transform:translateY(-6%);
+}
+
+/* Tipografía con animación .is-in */
+.firstname, .lastname, .entrada__slogan, .entrada__tag{
+  opacity: 0;
+  transform: translateY(1000%);
+  filter: blur(var(--anim-blur-text));
+  transition:
+    transform var(--anim-text-duration) var(--anim-ease),
+    opacity   calc(var(--anim-text-duration) - 100ms) ease-out,
+    filter    var(--anim-text-duration) var(--anim-ease);
+  will-change: transform, opacity, filter;
+}
+.firstname.is-in, .lastname.is-in, .entrada__slogan.is-in, .entrada__tag.is-in{
+  opacity: 1; transform: translateY(0); filter: blur(0);
+}
+
+/* === JERARQUÍA TIPOGRÁFICA — MÁS GRANDE + A LA IZQUIERDA === */
+.firstname{
+  display:block; font-weight:900; line-height:1; letter-spacing:.01em;
+  font-size: clamp(
+    2.4rem,
+    calc(7.5vw * var(--type-scale) * var(--first-bump)),
+    calc(6.8rem * var(--type-scale) * var(--first-bump))
+  );
+  white-space: nowrap; /* Evita quiebre en nombres muy largos */
+  overflow: visible; /* Asegura que no se corte el texto */
+}
+.lastname{
+  display:block; margin-top: calc(.35rem * var(--space-scale));
+  font-weight:500; letter-spacing:.02em; opacity:.96;
+  font-size: clamp(
+    1.2rem,
+    calc(2.8vw * var(--type-scale)),
+    calc(2.1rem * var(--type-scale))
+  );
+}
+.entrada__slogan{
+  margin-top: calc(1.1rem * var(--space-scale));
+  font-weight:600; opacity:.98; max-width: 40ch; margin-left:auto;
+  font-size: clamp(
+    1.1rem,
+    calc(2.4vw * var(--type-scale)),
+    calc(1.8rem * var(--type-scale))
+  );
+  line-height: 1.25;
+}
+.entrada__tag{
+  display:inline-block; 
+  margin-top: calc(.7rem * var(--space-scale));
+  font-weight:700; 
+  letter-spacing:.14em; 
+  text-transform:uppercase; 
+  opacity:.9;
+  font-size: clamp(
+    0.9rem,
+    calc(1.6vw * var(--type-scale)),
+    calc(1.3rem * var(--type-scale))
+  );
+
+  color: var(--tag-color);   /* ← USA EL TOKEN LOCAL */
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .entrada__media img,
+  .firstname, .lastname, .entrada__slogan, .entrada__tag{
+    transition: opacity 300ms linear !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ======= RESPONSIVE LAYOUT SAFEGUARDS ======= */
+
+/* Laptops/Tablets — más a la izquierda + más grande */
+@media (max-width: 1100px){
+  .entrada{
+    --type-scale: 1.25;
+    --first-bump: 1.22;
+    --space-scale: 1.15;
+    --entrada-foto-h: 130%;
+    --entrada-foto-offset-y: 18%;
+    --copy-grid-left: 48%;
+    --copy-maxw: 44ch;
+    --copy-pad: 5%;
+  }
+}
+
+/* Móvil/Tablet estrecho */
+@media (max-width: 760px){
+  .entrada{
+    --type-scale: 1.05;
+    --first-bump: 1.12;
+    --space-scale: 1.05;
+    --entrada-foto-h: 112%;
+    --entrada-foto-offset-y: 8%;
+    --copy-grid-left: 45%;
+    --copy-maxw: 32ch;
+    --copy-pad: 4.5%;
+  }
+
+  .entrada__media{
+    left: 0;
+    width: 50%;
+    padding-left: 0;
+  }
+  .entrada__media img{
+    height: var(--entrada-foto-h);
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .entrada__copy{
+    position: absolute; inset: 0; z-index: 3;
+    display: grid;
+    grid-template-columns: var(--copy-grid-left) 1fr;
+    align-items: center;
+    justify-items: end;
+    text-align: right;
+    padding: var(--copy-pad);
+    overflow: hidden;
+  }
+
+  .entrada__name{
+    grid-column: 2;
+    justify-self: end;
+    text-align: left;
+    transform: none;
+    max-width: var(--copy-maxw);
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .firstname, .lastname, .entrada__slogan, .entrada__tag{
+    word-break: normal;
+    hyphens: auto;
+  }
+}
+
+/* Móvil pequeño */
+@media (max-width: 420px){
+  .entrada{
+    --type-scale: 0.95;
+    --first-bump: 1.08;
+    --entrada-foto-h: 104%;
+    --entrada-foto-offset-y: 4%;
+    --copy-maxw: 30ch;
+    --copy-pad: 4%;
+    --copy-grid-left: 42%;
+  }
+
+  .firstname{
+    font-size: clamp(2.0rem, 8.5vw, 3.2rem);
+  }
+  .lastname{
+    font-size: clamp(1.0rem, 4.8vw, 1.5rem);
+  }
+  .entrada__slogan{
+    font-size: clamp(0.95rem, 4.2vw, 1.25rem);
+  }
+  .entrada__tag{
+    font-size: clamp(0.75rem, 3.3vw, 1.0rem);
+  }
+}
+
+/* === DESKTOP GRANDE: MÁS ESPACIO PARA "REDA" === */
+@media (min-width: 1400px) {
+  .entrada {
+    --copy-maxw: 55ch;   /* ← 42ch → 55ch = "REDA" CABE EN UNA LÍNEA */
+  }
+}
